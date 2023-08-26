@@ -8,11 +8,11 @@ A small project to create a book recommendation system using collaborative filte
 
 The final dataset created is made of multiple sources. The sources used are:
 
-- [Book Depository Dataset](https://www.kaggle.com/datasets/sp1thas/book-depository-dataset) This is denotes as [1]. (It has over 1M books with genre and description. Does not have user ratings. More than one author per book.) [1]
+- [Book Depository Dataset](https://www.kaggle.com/datasets/sp1thas/book-depository-dataset) This is denoted as [1]. (It has over 1M books with genre and description. Does not have user ratings. More than one author per book.) [1]
 
-- [Goodreads Book Datasets With User Rating 2M](https://www.kaggle.com/datasets/bahramjannesarr/goodreads-book-datasets-10m) This is denotes as [2]. (It has about 5M books scraped from GoodReads. Also has about 11000 user ratings. Does not has the genre though. On author per book.) [2]
+- [Goodreads Book Datasets With User Rating 2M](https://www.kaggle.com/datasets/bahramjannesarr/goodreads-book-datasets-10m) This is denoted as [2]. (It has about 5M books scraped from Goodreads. Also has about 11000 user ratings. Does not have the genre though. On author per book.) [2]
 
-- [Book Recommendation Dataset](https://www.kaggle.com/datasets/arashnic/book-recommendation-dataset) This is denotes as [2]. (Has about 279k users with some demographic info, 271k books. No description and no genre) [3]
+- [Book Recommendation Dataset](https://www.kaggle.com/datasets/arashnic/book-recommendation-dataset) This is denoted as [2]. (Has about 279k users with some demographic info, 271k books. No description and no genre) [3]
 
 The reasons behind using three different sources were these:
 
@@ -45,3 +45,5 @@ The final dataset has four files:
 876,145 users; 228,648,342 user-book interactions in users' shelves (include 112,131,203 reads and 104,551,549 ratings)
 
 I might work on this dataset later. But for now, I am using the dataset created above.
+
+Update: It turns out that this dataset is great if you want to just use interaction to build a recommendation system. However, it does not have any user metadata. Of course, the user metadata in the final dataset created above is very minimal. But it is better than nothing. So, I am sticking with the final dataset created above.

@@ -1,4 +1,4 @@
-# External Sources for Recommendation System 
+# External Sources for Recommendation System
 
 This page contains links to external sources for recommendation system.
 
@@ -13,6 +13,5 @@ This page contains links to external sources for recommendation system.
 [Recommendation Systems on Google Cloud | Google Cloud Skills Boost](https://www.cloudskillsboost.google/course_templates/39)
 
 ## Articles
-
 
 [Build a Recommendation Engine With Collaborative Filtering – Real Python](https://realpython.com/build-recommendation-engine-collaborative-filtering)
