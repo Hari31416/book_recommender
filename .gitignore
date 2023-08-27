@@ -3,3 +3,5 @@ __pycache__
 *.csv
 *.parquet
 *.zip
+goodreads_book_graph_dataset
+model/temp_notebooks

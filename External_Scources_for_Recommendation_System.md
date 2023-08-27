@@ -15,3 +15,11 @@ This page contains links to external sources for recommendation system.
 ## Articles
 
 [Build a Recommendation Engine With Collaborative Filtering – Real Python](https://realpython.com/build-recommendation-engine-collaborative-filtering)
+
+[Netflix Prize and SVD](http://buzzard.ups.edu/courses/2014spring/420projects/math420-UPS-spring-2014-gower-netflix-SVD.pdf)
+
+[Netflix Update: Try This at Home](https://sifter.org/~simon/journal/20061211.html)
+
+## Codes
+
+[Neural Matrix Factorization from scratch in PyTorch](https://sparsh-ai.github.io/rec-tutorials/matrixfactorization%20movielens%20pytorch%20scratch/2021/04/21/rec-algo-ncf-pytorch-pyy0715.html)
