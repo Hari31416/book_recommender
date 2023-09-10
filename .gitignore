@@ -7,3 +7,4 @@ goodreads_book_graph_dataset
 model/temp_notebooks
 notes/*ipynb
 .vscode
+.env
