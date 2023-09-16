@@ -115,5 +115,7 @@ class MLPModel(nn.Module):
         # Concatenate the user and book embeddings to form one vector.
         x = torch.cat([user_embedded, book_embedded], dim=-1)
         x = self.cf_layer(x)
+        x = self.affine_output(x)
+        x = self.logistic(x)
         x = torch.squeeze(x)
         return x

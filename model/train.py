@@ -9,6 +9,9 @@ from models import MLPModel
 from losses import MSE_L1L2Loss, BCELoss
 from trainer import Trainer
 
+# DATA_DIR = os.path.join(os.curdir, "..", "data", "final_dataset")
+DATA_DIR = r"C:\Users\harik\Desktop\Book_Recommendation\data\final_dataset"
+
 
 def create_model_config(model_name, m, n, **kwargs):
     """Creates the model configuration.
@@ -118,8 +121,11 @@ def create_loss_config(loss_function, **kwargs):
 
 
 def main(args):
-    # Initialize wandb
-    wandb.init(project=args["project_name"], name=args["run_name"])
+    if args["wandb"]:
+        # Initialize wandb
+        wandb.init(project=args["project_name"], name=args["run_name"])
+        wandb.run.name = args["run_name"]
+        wandb.log_interval = args["log_interval"]
 
     # data config
     data_config = create_data_config(
@@ -193,13 +199,21 @@ def main(args):
     all_config = {
         "data_config": data_config,
         "model_config": model_config,
-        "loss_config": loss_config,
-        "optimizer": args["optimizer"],
-        "scheduler": args["scheduler"],
-        "lr": args["lr"],
     }
-    wandb.config.update(all_config)
+    # flatten the config for wandb
+    all_config = {k: v for d in all_config.values() for k, v in d.items()}
+    all_config.update({"optimizer": args["optimizer"], "scheduler": args["scheduler"]})
 
+    if args["wandb"]:
+        wandb.config.update(all_config)
+
+    if args["wandb"]:
+        # Log the model
+        wandb.watch(model)
+        wandb_ = wandb
+
+    if not args["wandb"]:
+        wandb_ = None
     # Initialize the trainer
     trainer = Trainer(
         model=model,
@@ -208,7 +222,8 @@ def main(args):
         scheduler=scheduler,
         train_loader=train_loader,
         test_loader=test_loader,
-        wandb=wandb,
+        data_loader=data_loader,
+        wandb=wandb_,
     )
 
     # Train the model
@@ -224,12 +239,12 @@ if __name__ == "__main__":
     # Model config
     parser.add_argument("--model_name", type=str, default="mlp")
     parser.add_argument("--embedding_dim", type=int, default=32)
-    parser.add_argument("--cf_layer_neurons", type=list, default=[32, 16])
+    parser.add_argument("--cf_layer_neurons", nargs="+", type=int, default=[32, 16])
     parser.add_argument("--use_sigmoid", type=bool, default=True)
     parser.add_argument("--init_weights", type=bool, default=False)
 
     # Data config
-    DATA_DIR = os.path.join("..", "data", "final_dataset")
+    # DATA_DIR = os.path.join("..", "data", "final_dataset")
     parser.add_argument("--data_dir", type=str, default=DATA_DIR)
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--negative_samples_ratio", type=float, default=0.4)
@@ -251,12 +266,14 @@ if __name__ == "__main__":
     parser.add_argument("--scheduler", type=str, default="step")
 
     # Trainer config
-    parser.add_argument("--epochs", type=int, default=100)
-    parser.add_argument("--verbose", type=int, default=1)
+    parser.add_argument("--epochs", type=int, default=5)
+    parser.add_argument("--verbose", type=int, default=2)
 
     # Wandb config
+    parser.add_argument("--wandb", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--project_name", type=str, default="Book_Recommendation")
     parser.add_argument("--run_name", type=str, default="model_test_1")
+    parser.add_argument("--log_interval", type=int, default=20)
 
     args = parser.parse_args()
     args = vars(args)

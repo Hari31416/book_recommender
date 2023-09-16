@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import pandas as pd
 
-DATA_DIR = os.path.join("..", "data", "final_dataset")
+DATA_DIR = os.path.join(os.curdir, "..", "data", "final_dataset")
 
 
 class BookDataset(torch.utils.data.Dataset):
@@ -258,6 +258,7 @@ class DataLoader:
             normalize=self.config["normalize"],
             normalize_by=self.config["normalize_by"],
         )
+        self.decode_rating = train_dataset.decode_rating
         test_dataset = BookDataset(
             self.users,
             self.books,
