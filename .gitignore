@@ -8,3 +8,4 @@ model/temp_notebooks
 notes/*ipynb
 .vscode
 .env
+wandb
