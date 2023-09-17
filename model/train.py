@@ -10,7 +10,7 @@ from losses import MSE_L1L2Loss, BCELoss
 from trainer import Trainer
 
 # DATA_DIR = os.path.join(os.curdir, "..", "data", "final_dataset")
-DATA_DIR = r"C:\Users\harik\Desktop\Book_Recommendation\data\final_dataset"
+DATA_DIR = r"D:\harik\Desktop\Book_Recommendation\data\final_dataset"
 
 
 def create_model_config(model_name, m, n, **kwargs):
@@ -162,7 +162,7 @@ def main(args):
         embedding_dim=model_config["embedding_dim"],
         cf_layer_neurons=model_config["cf_layer_neurons"],
         use_sigmoid=model_config["use_sigmoid"],
-        init_weights=model_config["init_weights"],
+        init_weights_=model_config["init_weights"],
     )
 
     # Create the loss configuration
@@ -244,7 +244,6 @@ if __name__ == "__main__":
     parser.add_argument("--init_weights", type=bool, default=False)
 
     # Data config
-    # DATA_DIR = os.path.join("..", "data", "final_dataset")
     parser.add_argument("--data_dir", type=str, default=DATA_DIR)
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--negative_samples_ratio", type=float, default=0.4)

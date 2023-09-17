@@ -13,7 +13,7 @@ class MLPModel(nn.Module):
         embedding_dim,
         cf_layer_neurons,
         use_sigmoid=False,
-        init_weights=True,
+        init_weights_=True,
     ):
         """Initializes the BookNet model.
 
@@ -29,7 +29,7 @@ class MLPModel(nn.Module):
             List of integers specifying the number of neurons in each layer of the collaborative filtering part of the model.
         use_sigmoid: bool
             Whether to use sigmoid activation function for the last layer of the model.
-        init_weights: bool
+        init_weights_: bool
             Whether to initialize the weights of the model.
         """
         super(MLPModel, self).__init__()
@@ -38,7 +38,7 @@ class MLPModel(nn.Module):
         self.embedding_dim = embedding_dim
         self.cf_layer_neurons = cf_layer_neurons
         self.use_sigmoid = use_sigmoid
-        self.init_weights = init_weights
+        self.init_weights_ = init_weights_
 
         self.user_embedding, self.book_embedding = self.create_embedding_layer()
         self.cf_layer = self.create_CF_layer()
@@ -50,7 +50,7 @@ class MLPModel(nn.Module):
         else:
             self.logistic = torch.nn.ReLU()
 
-        if self.init_weights:
+        if self.init_weights_:
             self.init_weights()
 
     def create_embedding_layer(self):

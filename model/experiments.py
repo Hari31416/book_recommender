@@ -1,4 +1,5 @@
 import os, time
+from itertools import product
 
 
 def embedding_dim_experiments():
@@ -88,7 +89,37 @@ def cf_layers_experiments(debug=False):
         print("-----" * 10)
 
 
+def l1l2_experimenst(debug=False):
+    l1_ratios = [0.0, 1e-6, 1e-5]
+    l2_ratios = [0.0, 1e-6, 1e-5, 1e-4]
+    product_ratios = list(product(l1_ratios, l2_ratios))
+    run_names = [f"l1l2_{l1}_{l2}" for (l1, l2) in product_ratios]
+    for i in range(len(product_ratios)):
+        run_name = run_names[i]
+        l1_ratio, l2_ratio = product_ratios[i]
+        args = [
+            "python",
+            "train.py",
+            "--l1_weight",
+            str(l1_ratio),
+            "--l2_weight",
+            str(l2_ratio),
+            "--run_name",
+            run_name,
+        ]
+        cmd = " ".join(args)
+        if debug:
+            print(cmd)
+            continue
+        print(f"WORKING ON {run_name}")
+        os.system(cmd)
+        time.sleep(15)
+        print(f"FINISHED {run_name}")
+        print("-----" * 10)
+
+
 if __name__ == "__main__":
     # embedding_dim_experiments()
     # negative_sample_ratio_experiments(debug=False)
-    cf_layers_experiments(debug=False)
+    # cf_layers_experiments(debug=False)
+    l1l2_experimenst(debug=False)
