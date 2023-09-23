@@ -43,13 +43,6 @@ class BookDataset(torch.utils.data.Dataset):
         self.features = features
         self.normalize = normalize
         self.normalize_by = normalize_by
-        # self.negative_samples_ratio = config["negative_samples_ratio"]
-        # self.features = config["features"]
-        # self.normalize = config["normalize"]
-        # try:
-        #     self.normalize_by = config["normalize_by"]
-        # except KeyError:
-        #     self.normalize_by = "max"
         self.users = users
         self.books = books
         self.interactions = interactions.copy()
@@ -64,11 +57,12 @@ class BookDataset(torch.utils.data.Dataset):
         self.negative_samples_ratio = self.negative_samples_ratio
 
     def normalize_ratings(self):
-        """Normalizes the ratings by dividing by 10."""
+        """Normalizes the ratings by dividing by 10 or by using standardization."""
         if self.normalize_by == "max":
             self.interactions["provided_rating"] = (
                 self.interactions["provided_rating"] / 10
             ).round(2)
+
         elif self.normalize_by == "std":
             mean = self.interactions["provided_rating"].mean()
             std = self.interactions["provided_rating"].std()
@@ -98,13 +92,13 @@ class BookDataset(torch.utils.data.Dataset):
 
     def get_user_features(self, user_id):
         # Assumes that the user_id column is the index in the users DataFrame.
-        user = self.users.iloc[user_id].values
-        return user.reshape((self.m_f,))
+        user = self.users.iloc[int(user_id)][1:].values  # First column is the user_id
+        return user.reshape((self.m_f - 1,))
 
     def get_book_features(self, book_id):
         # Assumes that the book_id column is the index in the books DataFrame.
-        book = self.books.iloc[book_id].values
-        return book.reshape((self.n_f,))
+        book = self.books.iloc[int(book_id)][1:].values  # First column is the book_id
+        return book.reshape((self.n_f - 1,))
 
     def __len__(self):
         # tried this but this will give error as the interaction dataframe will become out of index
@@ -118,21 +112,21 @@ class BookDataset(torch.utils.data.Dataset):
         user_id = row["user_id"]
         book_id = row["book_id"]
         rating = row["provided_rating"]
-        user_id = np.array([user_id])
-        book_id = np.array([book_id])
         if self.features:
             user_features = self.get_user_features(user_id)
             book_features = self.get_book_features(book_id)
+            user_id = np.array([user_id])
+            book_id = np.array([book_id])
             user_input = np.concatenate([user_id, user_features], axis=-1)
             book_input = np.concatenate([book_id, book_features], axis=-1)
         else:
-            user_input = user_id
-            book_input = book_id
+            user_input = np.array([user_id])
+            book_input = np.array([book_id])
 
         # make sure the length of the input is correct
         if self.features:
-            assert len(user_input) == 1 + self.m_f
-            assert len(book_input) == 1 + self.n_f
+            assert len(user_input) == self.m_f
+            assert len(book_input) == self.n_f
         else:
             assert len(user_input) == 1
             assert len(book_input) == 1
@@ -151,21 +145,21 @@ class BookDataset(torch.utils.data.Dataset):
         ):
             negative_book_id = np.random.choice(self.books.index.values)
 
-        user_id = np.array([user_id])
-        book_id = np.array([negative_book_id])
         if self.features:
             user_features = self.get_user_features(user_id)
-            book_features = self.get_book_features(book_id)
+            book_features = self.get_book_features(negative_book_id)
+            user_id = np.array([user_id])
+            book_id = np.array([negative_book_id])
             user_input = np.concatenate([user_id, user_features], axis=-1)
             book_input = np.concatenate([book_id, book_features], axis=-1)
         else:
-            user_input = user_id
-            book_input = book_id
+            user_input = np.array([user_id])
+            book_input = np.array([negative_book_id])
 
         # make sure the length of the input is correct
         if self.features:
-            assert len(user_input) == 1 + self.m_f
-            assert len(book_input) == 1 + self.n_f
+            assert len(user_input) == self.m_f
+            assert len(book_input) == self.n_f
         else:
             assert len(user_input) == 1
             assert len(book_input) == 1
@@ -182,10 +176,6 @@ class BookDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         """Gets one sample from the dataset."""
-        # A workaround to make interaction dataframe circular when using negative sampling
-        # with `num_times` > 1. Leaving it as this should not be necessary here.
-        # if idx >= len(self.interactions):
-        #     idx = idx%len(self.interactions)
         user_input, book_input, rating = self.get_one_sample(idx)
         if self.features:
             dtype = torch.float32
@@ -225,6 +215,8 @@ class DataLoader:
         self.books = pd.read_parquet(os.path.join(self.data_dir, "books_final.parquet"))
         self.m = len(self.users)
         self.n = len(self.books)
+        self.m_f = self.users.shape[1] - 1
+        self.n_f = self.books.shape[1] - 1
 
     def split_dataframe(self, df, holdout_fraction=0.1):
         """Splits a DataFrame into training and test sets.

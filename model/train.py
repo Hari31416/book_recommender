@@ -5,7 +5,7 @@ import os
 import wandb
 
 from data_loader import DataLoader
-from models import MLPModel
+from models import MLPModel, MLPWithFeatures
 from losses import MSE_L1L2Loss, BCELoss
 from trainer import Trainer
 
@@ -143,6 +143,8 @@ def main(args):
     )
     m = data_loader.m
     n = data_loader.n
+    m_f = data_loader.m_f
+    n_f = data_loader.n_f
     train_loader, test_loader = data_loader.get_data_loaders()
 
     # Create the model configuration
@@ -150,20 +152,36 @@ def main(args):
         model_name=args["model_name"],
         m=m,
         n=n,
+        m_f=m_f,
+        n_f=n_f,
         embedding_dim=args["embedding_dim"],
+        feature_embedding_dim=args["feature_embedding_dim"],
         cf_layer_neurons=args["cf_layer_neurons"],
         use_sigmoid=args["use_sigmoid"],
         init_weights=args["init_weights"],
     )
     # Initialize the model
-    model = MLPModel(
-        m=model_config["m"],
-        n=model_config["n"],
-        embedding_dim=model_config["embedding_dim"],
-        cf_layer_neurons=model_config["cf_layer_neurons"],
-        use_sigmoid=model_config["use_sigmoid"],
-        init_weights_=model_config["init_weights"],
-    )
+    if model_config["name"] == "mlp":
+        model = MLPModel(
+            m=model_config["m"],
+            n=model_config["n"],
+            embedding_dim=model_config["embedding_dim"],
+            cf_layer_neurons=model_config["cf_layer_neurons"],
+            use_sigmoid=model_config["use_sigmoid"],
+            init_weights_=model_config["init_weights"],
+        )
+    elif model_config["name"] == "mlp_with_features":
+        model = MLPWithFeatures(
+            m=model_config["m"],
+            n=model_config["n"],
+            m_f=model_config["m_f"],
+            n_f=model_config["n_f"],
+            embedding_dim=model_config["embedding_dim"],
+            feature_embedding_dim=model_config["feature_embedding_dim"],
+            cf_layer_neurons=model_config["cf_layer_neurons"],
+            use_sigmoid=model_config["use_sigmoid"],
+            init_weights_=model_config["init_weights"],
+        )
 
     # Create the loss configuration
     loss_config = create_loss_config(
@@ -237,8 +255,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     # Model config
-    parser.add_argument("--model_name", type=str, default="mlp")
+    parser.add_argument("--model_name", type=str, default="mlp_with_features")
     parser.add_argument("--embedding_dim", type=int, default=32)
+    parser.add_argument("--feature_embedding_dim", type=int, default=32)
     parser.add_argument("--cf_layer_neurons", nargs="+", type=int, default=[32, 16])
     parser.add_argument("--use_sigmoid", type=bool, default=True)
     parser.add_argument("--init_weights", type=bool, default=False)
@@ -248,7 +267,9 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--negative_samples_ratio", type=float, default=0.4)
     parser.add_argument("--split_ratio", type=float, default=0.1)
-    parser.add_argument("--features", type=bool, default=False)
+    parser.add_argument(
+        "--features", action=argparse.BooleanOptionalAction, default=True
+    )
     parser.add_argument("--normalize", type=bool, default=True)
     parser.add_argument("--normalize_by", type=str, default="max")
 
